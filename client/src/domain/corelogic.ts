@@ -32,32 +32,43 @@ const EnhancementModifiers : Record<Enhancement, ScoreModifier> = {
 const evaluateScore : (score: Score) => Number =
     s => s.chips*s.mult
 
-interface Joker {
+abstract class Joker {
     jokerId: number
     name: string;
     description: string;
     edition: Edition;
     scoreModifier?: ScoreModifier;
     effects?: any;
+
+    constructor(
+        jokerId: number,
+        name: string,
+        description: string,
+        edition: Edition,
+        scoreModifier: ScoreModifier,
+        effects: any,
+    ) {
+        this.jokerId = jokerId;
+        this.name = name;
+        this.description = description;
+        this.edition = edition;
+        this.scoreModifier = scoreModifier;
+        this.effects = effects;
+    }
 }
 
 type JokerHand = Joker[]
 
-class PlainJoker implements Joker {
-    jokerId: number
-    name: string;
-    description: string;
-    edition: Edition;
-    scoreModifier?: ScoreModifier;
-    effects?: any;
-
+class PlainJoker extends Joker {
     constructor(edition : Edition) {
-        this.jokerId = 1;
-        this.name = "Joker";
-        this.description = "+4 Mult";
-        this.edition = edition;
-        this.scoreModifier = s => ({chips: s.chips, mult: s.mult+4});
-        this.effects = {};
+        super(
+            1,
+            "Joker",
+            "Adds +4 Mult",
+            edition,
+            s => ({chips: s.chips, mult: s.mult}),
+            undefined
+        )
     } 
 }
 
