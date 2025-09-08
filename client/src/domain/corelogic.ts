@@ -23,8 +23,8 @@ const EnhancementModifiers : Record<Enhancement, ScoreModifier> = {
     "Mult": s => ({chips: s.chips, mult: s.mult+4}),
     "Wild": s => ({chips: s.chips, mult: s.mult}),
     "Glass": s => ({chips: s.chips, mult: s.mult*2}),
-    "Steel": s => ({chips: s.chips, mult: s.mult}),
-    "Stone": s => ({chips: s.chips, mult: s.mult}),
+    "Steel": s => ({chips: s.chips, mult: s.mult*1.5}),
+    "Stone": s => ({chips: s.chips+50, mult: s.mult}),
     "Gold": s => ({chips: s.chips, mult: s.mult}),
     "Lucky": s => ({chips: s.chips, mult: s.mult}),
 }
@@ -50,18 +50,57 @@ const PlainJoker : Joker =
     ScoreModifier: s => ({chips: s.chips, mult: s.mult+4})
 }
 
-type Suit = "Hearts" | "Diamonds" | "Clubs" | "Spades"
+type Rank = 
+  | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+  | 'J' | 'Q' | 'K' | 'A' 
 
-type Card = {
-    rank: number | 'J' | 'Q' | 'K' | 'A',
-    suit: Suit,
-    baseChips: number,
-    bonusChips: number,
-    edition: Edition
-    enhancement: Enhancement
+const RankChips : Record<Rank, number> = {
+    2: 2,
+    3: 3,
+    4: 4,
+    5: 5,
+    6: 6,
+    7: 7,
+    8: 8,
+    9: 9,
+    10: 10,
+    'J': 10,
+    'Q' : 10,
+    'K' : 10,
+    'A' : 11
 }
 
-type CardHand = Card[]
+type Suit = "Hearts" | "Diamonds" | "Clubs" | "Spades";
+
+type Seal = "None" | "Red" | "Blue" | "Purple" | "Gold";
+
+class Card {
+    rank: Rank;
+    suit: Suit;
+    baseChips: number;
+    bonusChips: number;
+    edition: Edition;
+    enhancement: Enhancement
+    seal: Seal;
+
+    constructor( 
+        rank: Rank,
+        suit: Suit,
+        edition: Edition,
+        enhancement: Enhancement,
+        seal: Seal
+    ) {
+        this.rank = rank;
+        this.suit = suit;
+        this.edition = edition;
+        this.enhancement = enhancement;
+        this.seal = seal;
+        this.baseChips = RankChips[rank];
+        this.bonusChips = 0
+    }
+};
+
+type CardHand = Card[];
 
 
 const scoreHand = (
@@ -70,16 +109,39 @@ const scoreHand = (
     held: CardHand
 ): Score =>  {
         // Pre-Scoring
-        // Hand-detection MISSING
-        let score : Score = {chips: 40, mult: 4}        
+        // Hand-detection + Array of cards which are scoring
+        let score : Score = {chips: 40, mult: 4};    
 
-        // Played Cards Scoring
+        // Active Cards Scoring
+        for (let i = 0; i < played.length; i++) {
+            const c = played[i];
 
-        // Held Cards Scoring
+            // Add Base Chips
+            score.chips += c.baseChips;
+
+            // Card Enhancement
+            score = EnhancementModifiers[c.enhancement](score);
+
+            // Card Editon
+            score = EditionModifiers[c.edition](score);
+
+            // Joker Effect
+
+            // Possible Retrigger
+        }
+
+        // Held Cards Scoring (If seal or edition, or joker effect
+        for (let i = 0; i < held.length; i++) {
+            // Check for steel/gold
+
+            // Check for blue seal
+
+            // Check for joker effects
+        }
 
         // Remaining Jokers
         for (let i : number = 0; i < jokers.length; i++) {
-            const j = jokers[i]
+            const j = jokers[i];
 
             // Apply Joker Effect if exists
             score = j.ScoreModifier?.(score) ?? score;
@@ -93,8 +155,9 @@ const scoreHand = (
     }
 
 const start = performance.now();
-let res: Score = scoreHand([PlainJoker], [], []);  // <-- your predefined function call
+let res: Score = scoreHand([PlainJoker], [], []); 
 const end = performance.now();
+
 console.log(`⏱ Took ${(end - start).toFixed(2)} ms`);
 console.log(res);
 console.log(`Total Score: ${evaluateScore(res)}`);
