@@ -32,22 +32,33 @@ const EnhancementModifiers : Record<Enhancement, ScoreModifier> = {
 const evaluateScore : (score: Score) => Number =
     s => s.chips*s.mult
 
-type Joker = {
-    Name: string,
-    Description: string,
-    Edition: Edition
-    ScoreModifier?: ScoreModifier
-    Effects?: any
+interface Joker {
+    jokerId: number
+    name: string;
+    description: string;
+    edition: Edition;
+    scoreModifier?: ScoreModifier;
+    effects?: any;
 }
 
 type JokerHand = Joker[]
 
-const PlainJoker : Joker = 
-{
-    Name: "Joker",
-    Description: "Provides +4 Mult",
-    Edition: "Standard",
-    ScoreModifier: s => ({chips: s.chips, mult: s.mult+4})
+class PlainJoker implements Joker {
+    jokerId: number
+    name: string;
+    description: string;
+    edition: Edition;
+    scoreModifier?: ScoreModifier;
+    effects?: any;
+
+    constructor(edition : Edition) {
+        this.jokerId = 1;
+        this.name = "Joker";
+        this.description = "+4 Mult";
+        this.edition = edition;
+        this.scoreModifier = s => ({chips: s.chips, mult: s.mult+4});
+        this.effects = {};
+    } 
 }
 
 type Rank = 
@@ -144,10 +155,10 @@ const scoreHand = (
             const j = jokers[i];
 
             // Apply Joker Effect if exists
-            score = j.ScoreModifier?.(score) ?? score;
+            score = j.scoreModifier?.(score) ?? score;
 
             // Apply Joker Edition
-            score = EditionModifiers[j.Edition](score);
+            score = EditionModifiers[j.edition](score);
         }
 
         // Placeholders
@@ -155,9 +166,11 @@ const scoreHand = (
     }
 
 const start = performance.now();
-let res: Score = scoreHand([PlainJoker], [], []); 
+let res: Score = scoreHand([new PlainJoker("Standard")], [], []); 
 const end = performance.now();
 
 console.log(`⏱ Took ${(end - start).toFixed(2)} ms`);
 console.log(res);
 console.log(`Total Score: ${evaluateScore(res)}`);
+
+export {};
