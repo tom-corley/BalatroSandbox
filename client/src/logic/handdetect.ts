@@ -37,58 +37,63 @@ export const hasStraight = (hand: CardHand) : boolean => {
 }
 
 export const detectHand = (hand: CardHand) : [HandType, CardHand] => {
-    // Easiest case, one played card is always a high card, whole hand played
-    if (hand.length === 1) return ["High Card", hand];
-
-    // Use a set to group ranks together
     const rankSet = ListToFrequencySet(hand)
+    switch (hand.length) {
+        case 1: return ["High Card", hand];
 
-    // For two cards played check for pair
-    if (hand.length === 2) {
-        return (rankSet.size === 1 ? ["Pair", hand] : ["High Card", hand])
-    }
-
-    // For three cards played, either three of a kind, pair, or high card
-    if (hand.length === 3) {
-        switch (rankSet.size) {
-            case 1: return ["Three of a Kind", hand]
-            case 2: return ["Pair", hand]
-            case 3: return ["High Card", hand]
+        case 2 : { // Pair, High Card
+            if (rankSet.size === 1) return ["Pair", hand];
+            else return ["High Card", hand]; // Should only return higher of two cards here
         }
-    }
 
-    // For four cards played, more complex
-    if (hand.length === 4) {
-        switch (rankSet.size) {
-            case 1: return ["Four of a Kind", hand]
-            case 2: return ["Three of a Kind", hand] // Either three of a kind or two pair
-            case 3: return ["Pair", hand] // Pair
-            case 4: return ["High Card", hand]
+        case 3 : { // Three of a Kind, Pair, High Card
+            if (rankSet.size === 1) return ["Three of a Kind", hand];
+            else if (rankSet.size === 2) return ["Pair", hand] // only return pair here
+            else return ["High Card", hand]; // Should only return highest of three cards here
         }
-    }
 
-    // Five cards: Now must consider flushes and straights, and combo types
-    let handType : HandType = "High Card"
-    switch (rankSet.size) {
-        case 1: handType = "Five of a Kind"; break;
-        case 2: handType = "Four of a Kind"; break; // Either four of a kind or full house
-        case 3: handType = "Three of a Kind"; break; // Either three of a kind, two pair
-        case 4: handType = "Pair"; break;
-    }
-
-    // Flush Detection - MODIFY LATER FOR FOUR FINGERS etc
-    if (hasFlush(hand)) {
-        handType = "Flush";
-    }
-
-    // Straight Detection - MODIFY LATER FOR FOUR FINGERS etc
-    // Four Fingers, Shortcut Joker - modify behaviour
-    if (hasStraight(hand)) {
-        if (handType == "Flush") {
-            handType = "Straight Flush"
-        } else {
-            handType = "Straight";
+        case 4: { // Four of a Kind, Two Pair, Three of a Kind, Pair, High Card
+            if (rankSet.size === 1) return ["Four of a Kind", hand];
+            else if (rankSet.size === 2) return ["Three of a Kind", hand]; // Check if three of a kind or two pair, return suitable cards
+            else if (rankSet.size === 3) return ["Pair", hand] // only return pair here
+            else return ["High Card", hand]; // Should only return highest of three cards here
         }
+
+        case 5: { // All hand types possible, + flush variants
+            let handType : HandType;
+            if (rankSet.size === 1) handType = "Five of a Kind" 
+            else if (rankSet.size === 2) handType = "Full House";
+            else if (rankSet.size === 3) handType = "Three of a Kind";
+            else if (rankSet.size === 4) handType = "Pair";
+            else handType = "High Card"; // Should only return highest of three cards here
+            
+            // Straight Detection - MODIFY LATER FOR FOUR FINGERS etc
+            if (["Five of a Kind", "Four of a Kind", "Full House"].includes(handType)) {
+                ; // Cannot be improved by a straight
+            }
+            else if (hasStraight(hand)) { 
+                handType = "Straight";
+            }
+
+            // Flush Detection - MODIFY LATER FOR FOUR FINGERS etc 
+            //if (handType === "Four of a Kind") {
+              //  ;
+            //}
+            else if (hasFlush(hand)) {
+                if (handType === "Five of a Kind") {
+                    handType = "Flush Five"
+                } else if (handType === "Full House") {
+                    handType = "Flush House"
+                //} else if (handType === "Straight") {
+                //    handType = "Straight Flush"
+                } else {
+                    handType = "Flush";
+                }
+            }
+
+            return [handType, hand];
+        }
+
+        default: return ["High Card", hand];
     }
-    return [handType, hand];
 };
