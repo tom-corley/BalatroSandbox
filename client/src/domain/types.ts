@@ -50,7 +50,7 @@ export const RankChips : Record<Rank, number> = {
     'A' : 11
 }
 
-export const RankNumeric: Record<string, number> = {
+export const RankNumeric: Record<Rank, number> = {
   '2': 2,
   '3': 3,
   '4': 4,
@@ -59,12 +59,17 @@ export const RankNumeric: Record<string, number> = {
   '7': 7,
   '8': 8,
   '9': 9,
-  'T': 10,
+  '10': 10,
   'J': 11,
   'Q': 12,
   'K': 13,
   'A': 14
 };
+
+// Reverse Map
+export const NumericRank: Record<number, Rank> = Object.fromEntries(
+  Object.entries(RankNumeric).map(([k, v]) => [v as number, k as Rank])
+);
 
 export type Suit = "Hearts" | "Diamonds" | "Clubs" | "Spades";
 

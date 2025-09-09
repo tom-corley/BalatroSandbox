@@ -16,14 +16,17 @@ export class FrequencySet<T> {
         return true;
     }
 
+    // Number of unique values
     get size(): number {
         return this.map.size;
     }
 
+    // Frequency of a given value
     count(value: T) : number {
         return this.map.get(value) ?? 0
     }
 
+    // Array of unique values
     values() : T[] {
         return [...this.map.keys()];
     }

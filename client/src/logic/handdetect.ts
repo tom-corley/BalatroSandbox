@@ -1,5 +1,5 @@
 import { RankNumeric } from "../domain/types";
-import { type CardHand } from "../domain/cards";
+import { type CardHand} from "../domain/cards";
 import { type HandType } from "../domain/hands";
 import { ListToFrequencySet } from "../domain/freqset";
 
@@ -36,36 +36,44 @@ export const hasStraight = (hand: CardHand) : boolean => {
     return false;
 }
 
+// Sort by rank (new array)
+export const sortByRank = (hand: CardHand) : CardHand => {
+    return hand.slice().sort((a, b) => RankNumeric[a.rank] - RankNumeric[b.rank])
+}
+
 export const detectHand = (hand: CardHand) : [HandType, CardHand] => {
-    const rankSet = ListToFrequencySet(hand)
+    const rankSet = ListToFrequencySet(hand.map(c => RankNumeric[c.rank]))
     switch (hand.length) {
         case 1: return ["High Card", hand];
 
         case 2 : { // Pair, High Card
             if (rankSet.size === 1) return ["Pair", hand];
-            else return ["High Card", hand]; // Should only return higher of two cards here
+            else return ["High Card", [sortByRank(hand).at(-1)!]]; // high card
         }
+
 
         case 3 : { // Three of a Kind, Pair, High Card
             if (rankSet.size === 1) return ["Three of a Kind", hand];
-            else if (rankSet.size === 2) return ["Pair", hand] // only return pair here
-            else return ["High Card", hand]; // Should only return highest of three cards here
+            else if (rankSet.size === 2) {
+
+                return ["Pair", hand] // only return pair here
+            }
+            else return ["High Card", [sortByRank(hand).at(-1)!]]; // high card
         }
 
         case 4: { // Four of a Kind, Two Pair, Three of a Kind, Pair, High Card
             if (rankSet.size === 1) return ["Four of a Kind", hand];
-            else if (rankSet.size === 2) return ["Three of a Kind", hand]; // Check if three of a kind or two pair, return suitable cards
-            else if (rankSet.size === 3) return ["Pair", hand] // only return pair here
-            else return ["High Card", hand]; // Should only return highest of three cards here
+            else if (rankSet.size === 2) return ["Three of a Kind", hand]; 
+            else if (rankSet.size === 3) return ["Pair", hand] 
+            else return ["High Card", [sortByRank(hand).at(-1)!]]; 
         }
 
         case 5: { // All hand types possible, + flush variants
-            let handType : HandType;
+            let handType : HandType = "High Card";
             if (rankSet.size === 1) handType = "Five of a Kind" 
             else if (rankSet.size === 2) handType = "Full House";
             else if (rankSet.size === 3) handType = "Three of a Kind";
             else if (rankSet.size === 4) handType = "Pair";
-            else handType = "High Card"; // Should only return highest of three cards here
             
             // Straight Detection - MODIFY LATER FOR FOUR FINGERS etc
             if (["Five of a Kind", "Four of a Kind", "Full House"].includes(handType)) {
@@ -90,6 +98,8 @@ export const detectHand = (hand: CardHand) : [HandType, CardHand] => {
                     handType = "Flush";
                 }
             }
+
+            if (handType == "High Card") return ["High Card", [sortByRank(hand).at(-1)!]];
 
             return [handType, hand];
         }

@@ -34,4 +34,8 @@ export class Card {
     }
 };
 
+export const makeStandardCard = (rank: Rank, suit: Suit) : Card => {
+    return new Card(rank, suit, "Standard", "None", "None")
+}
+
 export type CardHand = Card[]
