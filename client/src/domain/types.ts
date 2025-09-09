@@ -50,6 +50,22 @@ export const RankChips : Record<Rank, number> = {
     'A' : 11
 }
 
+export const RankNumeric: Record<string, number> = {
+  '2': 2,
+  '3': 3,
+  '4': 4,
+  '5': 5,
+  '6': 6,
+  '7': 7,
+  '8': 8,
+  '9': 9,
+  'T': 10,
+  'J': 11,
+  'Q': 12,
+  'K': 13,
+  'A': 14
+};
+
 export type Suit = "Hearts" | "Diamonds" | "Clubs" | "Spades";
 
 export type Seal = "None" | "Red" | "Blue" | "Purple" | "Gold";
