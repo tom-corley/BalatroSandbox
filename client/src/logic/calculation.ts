@@ -1,6 +1,7 @@
 import type { Score } from "../domain/types"
 import { EditionModifiers, EnhancementModifiers } from "../domain/types"
 import type { JokerHand } from "../domain/jokers"
+import { detectHand, HandScore, type HandType } from "../domain/hands"
 import { PlainJoker } from "../domain/jokers"
 import type { CardHand } from "../domain/cards"
 
@@ -13,12 +14,16 @@ export const scoreHand = (
     held: CardHand
 ): Score =>  {
         // Pre-Scoring
-        // Hand-detection + Array of cards which are scoring
-        let score : Score = {chips: 40, mult: 4};    
+        // Hand-detection + array of cards which are scoring
+        let handType : HandType; let scored: CardHand;
+        [handType, scored] = detectHand(played)
+
+        let score : Score = HandScore[handType]   
 
         // Active Cards Scoring
-        for (let i = 0; i < played.length; i++) {
-            const c = played[i];
+        // Splash Joker / Stone Card can make non active played cards score??
+        for (let i = 0; i < scored.length; i++) {
+            const c = scored[i];
 
             // Add Base Chips
             score.chips += c.baseChips;

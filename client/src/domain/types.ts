@@ -30,19 +30,20 @@ export const EnhancementModifiers : Record<Enhancement, ScoreModifier> = {
 }
 
 export type Rank = 
-  | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
-  | 'J' | 'Q' | 'K' | 'A' 
+  '2' | '3' | '4' | '5' |
+  '6' | '7' | '8' | '9' | '10' |
+  'J' | 'Q' | 'K' | 'A' 
 
 export const RankChips : Record<Rank, number> = {
-    2: 2,
-    3: 3,
-    4: 4,
-    5: 5,
-    6: 6,
-    7: 7,
-    8: 8,
-    9: 9,
-    10: 10,
+    '2': 2,
+    '3': 3,
+    '4': 4,
+    '5': 5,
+    '6': 6,
+    '7': 7,
+    '8': 8,
+    '9': 9,
+    '10': 10,
     'J': 10,
     'Q' : 10,
     'K' : 10,
@@ -52,6 +53,3 @@ export const RankChips : Record<Rank, number> = {
 export type Suit = "Hearts" | "Diamonds" | "Clubs" | "Spades";
 
 export type Seal = "None" | "Red" | "Blue" | "Purple" | "Gold";
-
-export const evaluateScore : (score: Score) => Number =
-    s => s.chips*s.mult
