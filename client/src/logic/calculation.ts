@@ -1,9 +1,11 @@
 import type { Score } from "../domain/types"
 import { EditionModifiers, EnhancementModifiers } from "../domain/types"
 import type { JokerHand } from "../domain/jokers"
-import { detectHand, HandScore, type HandType } from "../domain/hands"
+import { HandScore, type HandType } from "../domain/hands"
 import { PlainJoker } from "../domain/jokers"
 import type { CardHand } from "../domain/cards"
+
+import { detectHand } from "./handdetect"
 
 export const evaluateScore : (score: Score) => Number =
     s => s.chips*s.mult
