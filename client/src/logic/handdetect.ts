@@ -1,13 +1,47 @@
 import { RankNumeric } from "../domain/types";
 import { type CardHand } from "../domain/cards";
 import { type HandType } from "../domain/hands";
+import { ListToFrequencySet } from "../domain/freqset";
+
+// Flush Detection
+export const hasFlush = (hand: CardHand) : boolean => {
+    // Flush Detection 
+    // Four Fingers, Smeared Joker - modify behaviour
+    const suitSet = new Set<string>(hand.map(card => card.suit));
+    if (suitSet.size === 1) {
+        return true;
+    }
+    return false;
+}
+
+// Straight Detection
+export const hasStraight = (hand: CardHand) : boolean => {
+    let numRanks : number[] = hand.map(card => RankNumeric[card.rank]);
+    numRanks.sort((a, b) => a - b);
+
+    // Treat Ace as both 1 and 14
+    if (numRanks.includes(14)) {
+        numRanks.unshift(1)
+    }
+
+    let run : number = 1
+    for (let i : number = 1; i < numRanks.length; i++) {
+        if (numRanks[i] == numRanks[i-1] + 1) {
+            run += 1
+            if (run >= 5) return true;
+        } else {
+            run = 1
+        }
+    }
+    return false;
+}
 
 export const detectHand = (hand: CardHand) : [HandType, CardHand] => {
-    // Easiest case, one played card is always a high card
+    // Easiest case, one played card is always a high card, whole hand played
     if (hand.length === 1) return ["High Card", hand];
 
     // Use a set to group ranks together
-    const rankSet = new Set<string>(hand.map(card => card.rank));
+    const rankSet = ListToFrequencySet(hand)
 
     // For two cards played check for pair
     if (hand.length === 2) {
@@ -50,41 +84,11 @@ export const detectHand = (hand: CardHand) : [HandType, CardHand] => {
     // Straight Detection - MODIFY LATER FOR FOUR FINGERS etc
     // Four Fingers, Shortcut Joker - modify behaviour
     if (hasStraight(hand)) {
-        handType = "Flush";
-    }
-
-    return [handType, hand] ;
-};
-
-// Flush Detection
-export const hasFlush = (hand: CardHand) : boolean => {
-    // Flush Detection 
-    // Four Fingers, Smeared Joker - modify behaviour
-    const suitSet = new Set<string>(hand.map(card => card.suit));
-    if (suitSet.size === 1) {
-        return true;
-    }
-    return false;
-}
-
-// Straight Detection
-export const hasStraight = (hand: CardHand) : boolean => {
-    let numRanks : number[] = hand.map(card => RankNumeric[card.rank]);
-    numRanks.sort((a, b) => a - b);
-
-    // Treat Ace as both 1 and 14
-    if (numRanks.includes(14)) {
-        numRanks.unshift(1)
-    }
-
-    let run : number = 1
-    for (let i : number = 1; i < numRanks.length; i++) {
-        if (numRanks[i] == numRanks[i-1] + 1) {
-            run += 1
-            if (run >= 5) return true;
+        if (handType == "Flush") {
+            handType = "Straight Flush"
         } else {
-            run = 1
+            handType = "Straight";
         }
     }
-    return false;
-}
+    return [handType, hand];
+};
