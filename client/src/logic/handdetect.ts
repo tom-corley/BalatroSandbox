@@ -1,4 +1,4 @@
-import { RankNumeric } from "../domain/types";
+import { type Rank, RankNumeric, NumericRank } from "../domain/types";
 import { type CardHand} from "../domain/cards";
 import { type HandType } from "../domain/hands";
 import { ListToFrequencySet } from "../domain/freqset";
@@ -55,16 +55,29 @@ export const detectHand = (hand: CardHand) : [HandType, CardHand] => {
         case 3 : { // Three of a Kind, Pair, High Card
             if (rankSet.size === 1) return ["Three of a Kind", hand];
             else if (rankSet.size === 2) {
-
-                return ["Pair", hand] // only return pair here
+                let pairRank : Rank = NumericRank[rankSet.keysWithFreq(2)[0]];
+                let pair : CardHand = hand.filter(card => card.rank === pairRank);
+                return ["Pair", pair]
             }
             else return ["High Card", [sortByRank(hand).at(-1)!]]; // high card
         }
 
         case 4: { // Four of a Kind, Two Pair, Three of a Kind, Pair, High Card
             if (rankSet.size === 1) return ["Four of a Kind", hand];
-            else if (rankSet.size === 2) return ["Three of a Kind", hand]; 
-            else if (rankSet.size === 3) return ["Pair", hand] 
+            else if ((rankSet.size === 2) && (rankSet.biggestKind === 3)) {
+                let tripleRank : Rank = NumericRank[rankSet.keysWithFreq(3)[0]];
+                let triple : CardHand = hand.filter(card => card.rank === tripleRank);
+                return ["Three of a Kind", triple]
+            } else if (rankSet.size === 2) {
+                let PairRanks : Rank[] = rankSet.keysWithFreq(2).map(num => NumericRank[num]);
+                let twoPair : CardHand = hand.filter(card => PairRanks.includes(card.rank));
+                return ["Two Pair", twoPair]
+            }
+            else if (rankSet.size === 3) { // Pair
+                let pairRank : Rank = NumericRank[rankSet.keysWithFreq(2)[0]];
+                let pair : CardHand = hand.filter(card => card.rank === pairRank);
+                return ["Pair", pair]
+            } 
             else return ["High Card", [sortByRank(hand).at(-1)!]]; 
         }
 
