@@ -4,9 +4,8 @@ import { type HandType } from "../domain/hands";
 import { ListToFrequencySet } from "../domain/freqset";
 
 // Flush Detection
+// Four Fingers, Smeared Joker - modify behaviour
 export const hasFlush = (hand: CardHand) : boolean => {
-    // Flush Detection 
-    // Four Fingers, Smeared Joker - modify behaviour
     const suitSet = new Set<string>(hand.map(card => card.suit));
     if (suitSet.size === 1) {
         return true;
@@ -15,6 +14,7 @@ export const hasFlush = (hand: CardHand) : boolean => {
 }
 
 // Straight Detection
+// Four Fingers, Smeared Joker - modify behaviour
 export const hasStraight = (hand: CardHand) : boolean => {
     let numRanks : number[] = hand.map(card => RankNumeric[card.rank]);
     numRanks.sort((a, b) => a - b);
@@ -82,12 +82,37 @@ export const detectHand = (hand: CardHand) : [HandType, CardHand] => {
         }
 
         case 5: { // All hand types possible, + flush variants
-            let handType : HandType = "High Card";
-            if (rankSet.size === 1) handType = "Five of a Kind" 
-            else if (rankSet.size === 2) handType = "Full House";
-            else if (rankSet.size === 3) handType = "Three of a Kind";
-            else if (rankSet.size === 4) handType = "Pair";
-            
+            let fl : boolean = hasFlush(hand)
+            let st : boolean = hasStraight(hand)
+            let handType : HandType
+            if (rankSet.size === 1) {
+                handType = "Five of a Kind" 
+                if (fl) {
+                    handType = "Flush Five"
+                }
+                return [handType, hand];
+            } else if ((rankSet.size === 2) && (rankSet.biggestKind === 4)) {
+                handType = "Four of a Kind";
+                let quadRank : Rank = NumericRank[rankSet.keysWithFreq(4)[0]];
+                let quad : CardHand = hand.filter(card => card.rank === quadRank);
+                return [handType, quad]
+            } else if (rankSet.size === 2) {
+                handType = "Full House"
+                if (fl) {
+                    handType = "Flush House"
+                } 
+                return [handType, hand]
+            } else if (st && fl) {
+                return ["Straight Flush", hand]
+            } else if (fl) {
+                return ["Flush", hand]
+            } else if (st) {
+                return ["Straight", hand]
+            } else if ((rankSet.size === 3) && (rankSet.biggestKind === 3)) {
+                let tripleRank : Rank = NumericRank[rankSet.keysWithFreq(3)[0]];
+                let triple : CardHand = hand.filter(card => card.rank === tripleRank);
+                return ["Three of a Kind", triple]
+            }
             // Straight Detection - MODIFY LATER FOR FOUR FINGERS etc
             if (["Five of a Kind", "Four of a Kind", "Full House"].includes(handType)) {
                 ; // Cannot be improved by a straight
