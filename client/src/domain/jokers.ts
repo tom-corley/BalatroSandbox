@@ -1,7 +1,10 @@
+import type { Card } from "./cards";
 import type {
   Edition,
   ScoreModifier,
 } from "./types";
+
+export type Target = (card: Card) => boolean;
 
 export abstract class Joker {
     jokerId: number
@@ -9,6 +12,8 @@ export abstract class Joker {
     description: string;
     edition: Edition;
     scoreModifier?: ScoreModifier;
+    targetCard : Target
+    targetEffect : ScoreModifier;
     effects?: any;
 
     constructor(
@@ -17,6 +22,8 @@ export abstract class Joker {
         description: string,
         edition: Edition,
         scoreModifier: ScoreModifier,
+        targetCard: Target,
+        targetEffect: ScoreModifier,
         effects: any,
     ) {
         this.jokerId = jokerId;
@@ -24,6 +31,8 @@ export abstract class Joker {
         this.description = description;
         this.edition = edition;
         this.scoreModifier = scoreModifier;
+        this.targetCard = targetCard;
+        this.targetEffect = targetEffect
         this.effects = effects;
     }
 }
@@ -38,6 +47,8 @@ export class PlainJoker extends Joker {
             "Joker",
             "Adds +4 Mult",
             edition,
+            s => ({chips: s.chips, mult: s.mult+4}),
+            _ => false,
             s => ({chips: s.chips, mult: s.mult}),
             undefined
         )
