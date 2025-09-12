@@ -81,7 +81,6 @@ export const detectHand = (hand: CardHand) : [HandType, CardHand] => {
             else return highCard(hand); // high card
         }
 
-
         case 3 : { // Three of a Kind, Pair, High Card
             if (rankSet.size === 1) return ["Three of a Kind", hand];
             else if (rankSet.size === 2) return xOfAKind(hand, 2, rankSet);
