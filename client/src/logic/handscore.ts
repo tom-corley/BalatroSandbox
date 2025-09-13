@@ -75,8 +75,15 @@ export const scoreHand = (
         // === HELD CARD SCORING ===
         for (let i = 0; i < held.length; i++) {
             // Check for steel/gold
+            const h : Card = held[i];
+            if (["Steel", "Gold"].includes(h.enhancement)) {
+                score = EnhancementModifiers[h.enhancement](score)
+            } 
 
             // Check for blue seal
+            if (h.seal === "Blue") {
+                ;
+            }
 
             // Check for joker effects
         }

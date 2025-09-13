@@ -26,7 +26,7 @@ export const EnhancementModifiers : Record<Enhancement, ScoreModifier> = {
     "Steel": s => ({chips: s.chips, mult: s.mult*1.5}),
     "Stone": s => ({chips: s.chips+50, mult: s.mult}),
     "Gold": s => ({chips: s.chips, mult: s.mult}),
-    "Lucky": s => ({chips: s.chips, mult: s.mult}),
+    "Lucky": s => ({chips: s.chips, mult: s.mult}), // IMPLEMENT PROPERLY
 }
 
 export type Rank = 
