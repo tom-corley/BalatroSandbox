@@ -36,6 +36,21 @@ export const hasStraight = (hand: CardHand) : boolean => {
     return false;
 }
 
+export const hasFullHouse = (hand : CardHand) : boolean => {
+    const rankSet = ListToFrequencySet(hand.map(c => RankNumeric[c.rank]));
+    return (hand.length === 5 && rankSet.size === 2 && rankSet.biggestKind === 3)
+}
+
+export const hasXofAKind = (hand: CardHand, x : number) : boolean => {
+    const rankSet = ListToFrequencySet(hand.map(c => RankNumeric[c.rank]));
+    return rankSet.biggestKind >= x
+}
+
+export const hasTwoPair = (hand: CardHand) : boolean => {
+    const rankSet = ListToFrequencySet(hand.map(c => RankNumeric[c.rank]));
+    return hasFullHouse(hand) || (rankSet.keysWithFreq(2).length === 2)
+}
+
 export const highCard = (hand : CardHand) : [HandType, CardHand] => {
     return ["High Card", [sortByRank(hand).at(-1)!]];
 }
