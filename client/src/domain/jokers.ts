@@ -3,7 +3,7 @@ import type {
   Edition,
   ScoreModifier,
 } from "./types";
-import { hasFlush, hasFullHouse, hasStraight, hasTwoPair, hasXofAKind } from "../logic/handdetect";
+import { hasFlush, hasStraight, hasTwoPair, hasXofAKind } from "../logic/handdetect";
 
 export type Target = (card: Card) => boolean;
 export type HandContext = {hand: CardHand, held: CardHand, deck: CardHand, jokers: JokerHand, discards: number, hands: number};

@@ -4,7 +4,7 @@ function App() {
 
   return (
     <>
-      Hello,World 
+      <h1>Balatro Sandbox</h1>
     </>
   )
 }
