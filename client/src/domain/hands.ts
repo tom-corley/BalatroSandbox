@@ -11,7 +11,7 @@ export const HandScore : Record<HandType, Score> = {
     "High Card" : {chips: 5, mult: 1},
     "Pair" : {chips: 10, mult: 2},
     "Two Pair" : {chips: 20, mult: 2},
-    "Three of a Kind" : {chips: 30, mult: 13},
+    "Three of a Kind" : {chips: 30, mult: 3},
     "Straight" : {chips: 30, mult: 4},
     "Flush" : {chips: 35, mult: 4},
     "Full House" : {chips: 40, mult: 4},

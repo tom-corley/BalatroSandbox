@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { CardHand, makeStandardCard, } from "../../src/domain/cards"
-import { JollyJoker, LustyJoker, PlainJoker, SlyJoker } from "../../src/domain/jokers";
+import { JollyJoker, LustyJoker, PlainJoker, SlyJoker, WilyJoker } from "../../src/domain/jokers";
 import { scoreHand, evaluateScore } from "../../src/logic/handscore"
 import { JokerHand } from "../../src/domain/jokers";
 import { Score } from "../../src/domain/types"
@@ -166,5 +166,28 @@ describe("Score Hand", () => {
 
         // Assert
         expect(res).toBe(80*2);
+    })
+
+    it("applies wily joker buff", () => {
+        // Arrange
+        const testHand : CardHand = [
+            makeStandardCard('2','Hearts'),
+            makeStandardCard('J','Hearts'),
+            makeStandardCard('J','Clubs'),
+            makeStandardCard('J', 'Hearts')
+        ];
+
+        const testJokers : JokerHand = [new WilyJoker("Standard")]
+        const testReserve : CardHand = []
+
+        // Act
+        const testScore : Score = scoreHand(testJokers, testHand, testReserve)
+        console.log(testScore);
+        const res = evaluateScore(testScore)
+        console.log(res);
+
+
+        // Assert
+        expect(res).toBe(160*3);
     })
 });
